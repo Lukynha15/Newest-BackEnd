@@ -19,6 +19,7 @@ model Post {
   id      Int     @id @default(autoincrement())
   title   String
   content String
+  likes   Int     @default(0)
   comments Comment[]
 
   authorId Int
