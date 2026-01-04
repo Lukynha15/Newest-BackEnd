@@ -11,6 +11,8 @@ model User {
   name    String
   email   String  @unique
   password String
+  createdAt DateTime @default(now())
+  avatar  String?
 
   posts   Post[]
 }
@@ -21,6 +23,7 @@ model Post {
   content String
   likes   Int     @default(0)
   comments Comment[]
+  createdAt DateTime @default(now())
 
   authorId Int
   author   User    @relation(fields: [authorId], references: [id])
@@ -31,4 +34,5 @@ model Comment {
   content String
   post    Post    @relation(fields: [postId], references: [id])
   postId  Int
+  createdAt DateTime @default(now())
 }

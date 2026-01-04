@@ -3,4 +3,5 @@ export class CreatePostDto {
   content: string;
   likes: number;
   authorId: number;
+  createdAt: Date;
 }
