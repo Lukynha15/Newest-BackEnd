@@ -9,7 +9,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -19,12 +18,19 @@ import { PostsService } from './posts.service';
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  // @Post()
-  // @UseGuards(JwtAuthGuard)
-  // @Post(':authId')
-  // create(@Body() @Param('authId') createPostDto: CreatePostDto) {
-  //   return this.postsService.create(createPostDto);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async create(@Body() createPostDto: CreatePostDto, @Req() req) {
+    const userId = req.user.userId;
+    return this.postsService.create(createPostDto, userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getMyPosts(@Req() req) {
+    const userId = req.user.userId;
+    return this.postsService.findByUserId(userId);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get()
