@@ -7,32 +7,31 @@ datasource db {
 }
 
 model User {
-  id      Int     @id @default(autoincrement())
-  name    String
-  email   String  @unique
-  password String
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  avatar    String?
   createdAt DateTime @default(now())
-  avatar  String?
-
-  posts   Post[]
+  bio       String?
+  posts     Post[]
 }
 
 model Post {
-  id      Int     @id @default(autoincrement())
-  title   String
-  content String
-  likes   Int     @default(0)
-  comments Comment[]
-  createdAt DateTime @default(now())
-
-  authorId Int
-  author   User    @relation(fields: [authorId], references: [id])
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  authorId  Int
+  likes     Int       @default(0)
+  createdAt DateTime  @default(now())
+  comments  Comment[]
+  author    User      @relation(fields: [authorId], references: [id])
 }
 
 model Comment {
-  id      Int     @id @default(autoincrement())
-  content String
-  post    Post    @relation(fields: [postId], references: [id])
-  postId  Int
+  id        Int      @id @default(autoincrement())
+  content   String
+  postId    Int
   createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id])
 }

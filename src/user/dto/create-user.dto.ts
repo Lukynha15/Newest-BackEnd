@@ -3,5 +3,6 @@ export class CreateUserDto {
   email: string;
   password: string;
   avatar: string;
+  bio: string;
   createdAt: Date;
 }

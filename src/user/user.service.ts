@@ -9,7 +9,7 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { name, email, password } = createUserDto;
+    const { name, email, bio, password } = createUserDto;
 
     const userExists = await this.prisma.user.findUnique({ where: { email } });
 
@@ -23,6 +23,7 @@ export class UserService {
       data: {
         name,
         email,
+        bio,
         password: hashPassword,
       },
     });
@@ -38,6 +39,7 @@ export class UserService {
         name: true,
         avatar: true,
         createdAt: true,
+        bio: true,
       },
     });
   }
