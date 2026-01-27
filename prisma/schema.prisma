@@ -15,17 +15,29 @@ model User {
   createdAt DateTime @default(now())
   bio       String?
   posts     Post[]
+  likes     Like[]
+}
+
+model Like {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  postId Int
+  user   User @relation(fields: [userId], references: [id])
+  post   Post @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
 }
 
 model Post {
-  id        Int       @id @default(autoincrement())
-  title     String
-  content   String
-  authorId  Int
-  likes     Int       @default(0)
-  createdAt DateTime  @default(now())
-  comments  Comment[]
-  author    User      @relation(fields: [authorId], references: [id])
+  id         Int       @id @default(autoincrement())
+  title      String
+  content    String
+  authorId   Int
+  createdAt  DateTime  @default(now())
+  likesCount Int       @default(0)
+  comments   Comment[]
+  author     User      @relation(fields: [authorId], references: [id])
+  likes      Like[]
 }
 
 model Comment {

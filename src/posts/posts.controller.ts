@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Body,
   Controller,
@@ -11,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
 import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsService } from './posts.service';
 
 @Controller('posts')
@@ -33,21 +33,30 @@ export class PostsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  findAll() {
-    return this.postsService.findAll();
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.postsService.findOne(+id);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+  @Patch(':postId/like')
+  async toggleLike(@Param('postId') postId: string, @Req() req) {
+    const userId = req.user.userId;
+    return this.postsService.toggleLike(parseInt(postId), userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getAllPosts(@Req() req) {
+    const userId = req.user.userId;
+    return this.postsService.getAllPosts(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getPostById(@Param('id') id: string, @Req() req) {
+    const currentUserId = req.user.userId;
+    return this.postsService.findOne(parseInt(id), currentUserId);
   }
 
   @UseGuards(JwtAuthGuard)
