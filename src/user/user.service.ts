@@ -9,7 +9,7 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { name, email, bio, password } = createUserDto;
+    const { name, email, bio, password, avatar } = createUserDto;
 
     const userExists = await this.prisma.user.findUnique({ where: { email } });
 
@@ -24,6 +24,7 @@ export class UserService {
         name,
         email,
         bio,
+        avatar,
         password: hashPassword,
       },
     });
@@ -56,12 +57,23 @@ export class UserService {
     return this.prisma.user.findUnique({ where: { id } });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.prisma.user.update({
-      where: { id },
+  async update(userId: number, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+
+    return this.prisma.user.update({
+      where: { id: userId },
       data: updateUserDto,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        avatar: true,
+        createdAt: true,
+      },
     });
-    return user;
   }
 
   async remove(id: number) {
