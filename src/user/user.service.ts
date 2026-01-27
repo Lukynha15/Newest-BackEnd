@@ -40,6 +40,7 @@ export class UserService {
         avatar: true,
         createdAt: true,
         bio: true,
+        email: true,
       },
     });
   }
