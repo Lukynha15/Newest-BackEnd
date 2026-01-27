@@ -32,7 +32,10 @@ export class UserService {
   }
 
   async findById(userId: number) {
-    return this.prisma.user.findUnique({
+    const totalPosts = await this.prisma.post.count({
+      where: { authorId: userId },
+    });
+    const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -43,6 +46,7 @@ export class UserService {
         email: true,
       },
     });
+    return { ...user, totalPosts };
   }
   findAll() {
     return this.prisma.user.findMany();
