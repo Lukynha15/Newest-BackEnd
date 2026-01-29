@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -45,6 +46,27 @@ export class UserController {
   update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
     const userId = req.user.userId;
     return this.userService.update(userId, updateUserDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('search')
+  async searchUsers(@Query('q') query: string) {
+    if (!query || query.trim() === '') {
+      return [];
+    }
+    return await this.userService.searchUsers(query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getUserById(@Param('id') id: string) {
+    return this.userService.findOne(+id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/posts')
+  async getUserPosts(@Param('id') id: string) {
+    return this.userService.getUserPosts(+id);
   }
 
   @UseGuards(JwtAuthGuard)
