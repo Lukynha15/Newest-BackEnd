@@ -69,22 +69,10 @@ export class PostsService {
   }
 
   async getAllPosts(currentUserId?: number) {
-    const allLikes = await this.prisma.like.findMany();
-    console.log(
-      '3. TODOS os likes no banco:',
-      JSON.stringify(allLikes, null, 2),
-    );
-
     if (currentUserId) {
       const userLikes = await this.prisma.like.findMany({
         where: { userId: currentUserId },
       });
-      console.log(
-        '4. Likes do usuário',
-        currentUserId,
-        ':',
-        JSON.stringify(userLikes, null, 2),
-      );
     }
 
     const posts = await this.prisma.post.findMany({
@@ -111,17 +99,8 @@ export class PostsService {
       },
     });
 
-    console.log(
-      '5. Posts retornados pelo Prisma:',
-      JSON.stringify(posts, null, 2),
-    );
-
     const result = posts.map((post: any) => {
       const isLiked = post.likes ? post.likes.length > 0 : false;
-      console.log(`6. Post ${post.id}:`);
-      console.log(`   - likes array:`, post.likes);
-      console.log(`   - isLiked calculado:`, isLiked);
-
       return {
         id: post.id,
         title: post.title,
@@ -132,10 +111,6 @@ export class PostsService {
         isLiked: isLiked,
       };
     });
-
-    console.log('7. Resultado final:', JSON.stringify(result, null, 2));
-    console.log('=== FIM DEBUG ===');
-
     return result;
   }
 
