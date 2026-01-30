@@ -8,8 +8,13 @@ import {
   Post,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -46,6 +51,45 @@ export class UserController {
   update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
     const userId = req.user.userId;
     return this.userService.update(userId, updateUserDto);
+  }
+
+  // ⚠️ NOVA ROTA - Upload de Avatar
+  @UseGuards(JwtAuthGuard)
+  @Post('avatar')
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      storage: diskStorage({
+        destination: './uploads/avatars',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `avatar-${uniqueSuffix}${ext}`);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+          return callback(new Error('Apenas imagens são permitidas!'), false);
+        }
+        callback(null, true);
+      },
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB
+      },
+    }),
+  )
+  async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+    const userId = req.user.userId;
+
+    if (!file) {
+      throw new Error('Nenhum arquivo foi enviado');
+    }
+
+    const avatarUrl = `/uploads/avatars/${file.filename}`;
+
+    await this.userService.updateAvatar(userId, avatarUrl);
+
+    return { avatarUrl };
   }
 
   @UseGuards(JwtAuthGuard)

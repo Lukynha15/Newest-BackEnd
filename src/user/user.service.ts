@@ -53,6 +53,7 @@ export class UserService {
     });
     return { ...user, totalPosts };
   }
+
   findAll() {
     return this.prisma.user.findMany();
   }
@@ -65,6 +66,22 @@ export class UserService {
     return this.prisma.user.update({
       where: { id: userId },
       data: updateUserDto,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        avatar: true,
+        createdAt: true,
+      },
+    });
+  }
+
+  // ⚠️ NOVO MÉTODO - Atualizar Avatar
+  async updateAvatar(userId: number, avatarUrl: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { avatar: avatarUrl },
       select: {
         id: true,
         name: true,
