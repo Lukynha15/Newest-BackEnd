@@ -7,19 +7,10 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors();
-
-  // ⚠️ Sobe 2 níveis: dist → raiz do projeto
   app.useStaticAssets(join(__dirname, '..', '..', 'uploads'), {
     prefix: '/uploads/',
   });
 
   await app.listen(process.env.PORT ?? 3000);
-
-  console.log(
-    `🚀 Server running on http://localhost:${process.env.PORT ?? 3000}`,
-  );
-  console.log(
-    `📁 Static files from: ${join(__dirname, '..', '..', 'uploads')}`,
-  );
 }
 bootstrap();

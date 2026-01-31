@@ -53,7 +53,6 @@ export class UserController {
     return this.userService.update(userId, updateUserDto);
   }
 
-  // ⚠️ NOVA ROTA - Upload de Avatar
   @UseGuards(JwtAuthGuard)
   @Post('avatar')
   @UseInterceptors(
@@ -74,7 +73,7 @@ export class UserController {
         callback(null, true);
       },
       limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB
+        fileSize: 5 * 1024 * 1024,
       },
     }),
   )
@@ -109,8 +108,9 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id/posts')
-  async getUserPosts(@Param('id') id: string) {
-    return this.userService.getUserPosts(+id);
+  async getUserPosts(@Param('id') id: string, @Req() req) {
+    const currentUserId = req.user.userId;
+    return this.userService.getUserPosts(+id, currentUserId);
   }
 
   @UseGuards(JwtAuthGuard)

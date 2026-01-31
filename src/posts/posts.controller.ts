@@ -29,20 +29,7 @@ export class PostsController {
   @Get('me')
   async getMyPosts(@Req() req) {
     const userId = req.user.userId;
-    return this.postsService.findByUserId(userId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(+id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Patch(':postId/like')
-  async toggleLike(@Param('postId') postId: string, @Req() req) {
-    const userId = req.user.userId;
-    return this.postsService.toggleLike(parseInt(postId), userId);
+    return this.postsService.findByUserId(userId, userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -57,6 +44,20 @@ export class PostsController {
   async getPostById(@Param('id') id: string, @Req() req) {
     const currentUserId = req.user.userId;
     return this.postsService.findOne(parseInt(id), currentUserId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':postId/like')
+  async toggleLike(@Param('postId') postId: string, @Req() req) {
+    const userId = req.user.userId;
+    return this.postsService.toggleLike(parseInt(postId), userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('user/:userId')
+  async getUserPosts(@Param('userId') userId: string, @Req() req) {
+    const currentUserId = req.user.userId;
+    return this.postsService.findByUserId(parseInt(userId), currentUserId);
   }
 
   @UseGuards(JwtAuthGuard)

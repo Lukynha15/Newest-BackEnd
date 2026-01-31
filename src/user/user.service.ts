@@ -77,7 +77,6 @@ export class UserService {
     });
   }
 
-  // ⚠️ NOVO MÉTODO - Atualizar Avatar
   async updateAvatar(userId: number, avatarUrl: string) {
     return this.prisma.user.update({
       where: { id: userId },
@@ -168,7 +167,7 @@ export class UserService {
     };
   }
 
-  async getUserPosts(userId: number) {
+  async getUserPosts(userId: number, currentUserId?: number) {
     const posts = await this.prisma.post.findMany({
       where: { authorId: userId },
       include: {
@@ -179,6 +178,12 @@ export class UserService {
             avatar: true,
           },
         },
+        likes: currentUserId
+          ? {
+              where: { userId: currentUserId },
+              select: { id: true },
+            }
+          : false,
         _count: {
           select: {
             likes: true,
@@ -195,6 +200,7 @@ export class UserService {
       ...post,
       likes: post._count.likes,
       comments: post._count.comments,
+      isLiked: Array.isArray(post.likes) && post.likes.length > 0,
     }));
   }
 
