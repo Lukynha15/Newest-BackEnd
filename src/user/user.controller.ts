@@ -29,7 +29,35 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      storage: diskStorage({
+        destination: './uploads/avatars',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `avatar-${uniqueSuffix}${ext}`);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+          return callback(new Error('Apenas imagens são permitidas!'), false);
+        }
+        callback(null, true);
+      },
+      limits: {
+        fileSize: 5 * 1024 * 1024,
+      },
+    }),
+  )
+  create(
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    if (file) {
+      createUserDto.avatar = `/uploads/avatars/${file.filename}`;
+    }
     return this.userService.create(createUserDto);
   }
 
