@@ -7,8 +7,8 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
+  id        String   @id @default(uuid())
+  name      String   @unique
   email     String   @unique
   password  String
   avatar    String?
@@ -19,31 +19,31 @@ model User {
 }
 
 model Like {
-  id     Int  @id @default(autoincrement())
-  userId Int
-  postId Int
-  user   User @relation(fields: [userId], references: [id])
-  post   Post @relation(fields: [postId], references: [id])
+  id     String @id @default(uuid())
+  userId String
+  postId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
 }
 
 model Post {
-  id         Int       @id @default(autoincrement())
+  id         String    @id @default(uuid())
   title      String
   content    String
-  authorId   Int
+  authorId   String
   createdAt  DateTime  @default(now())
   likesCount Int       @default(0)
   comments   Comment[]
-  author     User      @relation(fields: [authorId], references: [id])
+  author     User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   likes      Like[]
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   content   String
-  postId    Int
+  postId    String
   createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 }

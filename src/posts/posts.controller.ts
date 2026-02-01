@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Body,
   Controller,
@@ -40,29 +39,29 @@ export class PostsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('user/:userId')
+  async getUserPosts(@Param('userId') userId: string, @Req() req) {
+    const currentUserId = req.user.userId;
+    return this.postsService.findByUserId(userId, currentUserId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getPostById(@Param('id') id: string, @Req() req) {
     const currentUserId = req.user.userId;
-    return this.postsService.findOne(parseInt(id), currentUserId);
+    return this.postsService.findOne(id, currentUserId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch(':postId/like')
   async toggleLike(@Param('postId') postId: string, @Req() req) {
     const userId = req.user.userId;
-    return this.postsService.toggleLike(parseInt(postId), userId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('user/:userId')
-  async getUserPosts(@Param('userId') userId: string, @Req() req) {
-    const currentUserId = req.user.userId;
-    return this.postsService.findByUserId(parseInt(userId), currentUserId);
+    return this.postsService.toggleLike(postId, userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.postsService.remove(+id);
+    return this.postsService.remove(id);
   }
 }

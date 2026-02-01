@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CommentService {
   constructor(private prisma: PrismaService) {}
+
   async create(createCommentDto: CreateCommentDto) {
     const commentPost = await this.prisma.comment.create({
       data: {
@@ -12,14 +13,19 @@ export class CommentService {
         postId: createCommentDto.postId,
       },
     });
+
     return commentPost;
   }
 
-  findOne(id: number) {
-    return this.prisma.comment.findUnique({ where: { id } });
+  findOne(id: string) {
+    return this.prisma.comment.findUnique({
+      where: { id },
+    });
   }
 
-  remove(id: number) {
-    return this.prisma.comment.delete({ where: { id } });
+  remove(id: string) {
+    return this.prisma.comment.delete({
+      where: { id },
+    });
   }
 }

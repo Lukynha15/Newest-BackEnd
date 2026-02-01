@@ -20,10 +20,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
-interface RequestWithUser extends Request {
-  user: { id: number };
-}
-
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -34,8 +30,7 @@ export class UserController {
       storage: diskStorage({
         destination: './uploads/avatars',
         filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
           callback(null, `avatar-${uniqueSuffix}${ext}`);
         },
@@ -131,19 +126,19 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getUserById(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.userService.findOne(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id/posts')
   async getUserPosts(@Param('id') id: string, @Req() req) {
     const currentUserId = req.user.userId;
-    return this.userService.getUserPosts(+id, currentUserId);
+    return this.userService.getUserPosts(id, currentUserId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    return this.userService.remove(id);
   }
 }

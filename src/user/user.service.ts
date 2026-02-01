@@ -36,7 +36,7 @@ export class UserService {
     return user;
   }
 
-  async findById(userId: number) {
+  async findById(userId: string) {
     const totalPosts = await this.prisma.post.count({
       where: { authorId: userId },
     });
@@ -58,7 +58,7 @@ export class UserService {
     return this.prisma.user.findMany();
   }
 
-  async update(userId: number, updateUserDto: UpdateUserDto) {
+  async update(userId: string, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
@@ -77,7 +77,7 @@ export class UserService {
     });
   }
 
-  async updateAvatar(userId: number, avatarUrl: string) {
+  async updateAvatar(userId: string, avatarUrl: string) {
     return this.prisma.user.update({
       where: { id: userId },
       data: { avatar: avatarUrl },
@@ -139,7 +139,7 @@ export class UserService {
     return formattedUsers;
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
       select: {
@@ -167,7 +167,7 @@ export class UserService {
     };
   }
 
-  async getUserPosts(userId: number, currentUserId?: number) {
+  async getUserPosts(userId: string, currentUserId?: string) {
     const posts = await this.prisma.post.findMany({
       where: { authorId: userId },
       include: {
@@ -204,7 +204,7 @@ export class UserService {
     }));
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return await this.prisma.user.delete({ where: { id } });
   }
 }

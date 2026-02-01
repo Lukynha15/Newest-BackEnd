@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { Like } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
@@ -8,7 +7,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
-  async toggleLike(postId: number, userId: number) {
+  async toggleLike(postId: string, userId: string) {
     const existingLike: Like | null = await this.prisma.like.findUnique({
       where: {
         userId_postId: {
@@ -68,13 +67,7 @@ export class PostsService {
     }
   }
 
-  async getAllPosts(currentUserId?: number) {
-    if (currentUserId) {
-      const userLikes = await this.prisma.like.findMany({
-        where: { userId: currentUserId },
-      });
-    }
-
+  async getAllPosts(currentUserId?: string) {
     const posts = await this.prisma.post.findMany({
       orderBy: { createdAt: 'desc' },
       select: {
@@ -114,7 +107,7 @@ export class PostsService {
     return result;
   }
 
-  async findByUserId(userId: number, currentUserId?: number) {
+  async findByUserId(userId: string, currentUserId?: string) {
     const posts = await this.prisma.post.findMany({
       where: { authorId: userId },
       orderBy: { createdAt: 'desc' },
@@ -151,7 +144,7 @@ export class PostsService {
     }));
   }
 
-  async findOne(postId: number, currentUserId?: number) {
+  async findOne(postId: string, currentUserId?: string) {
     const post = await this.prisma.post.findUnique({
       where: { id: postId },
       select: {
@@ -187,7 +180,7 @@ export class PostsService {
     };
   }
 
-  async create(createPostDto: CreatePostDto, userId: number) {
+  async create(createPostDto: CreatePostDto, userId: string) {
     return this.prisma.post.create({
       data: {
         ...createPostDto,
@@ -210,7 +203,7 @@ export class PostsService {
     });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return await this.prisma.post.delete({ where: { id } });
   }
 }
