@@ -15,10 +15,16 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const { name, email, bio, password, avatar } = createUserDto;
 
-    const userExists = await this.prisma.user.findUnique({ where: { email } });
+    const emailExists = await this.prisma.user.findUnique({ where: { email } });
 
-    if (userExists) {
-      throw new UnauthorizedException('Usuário já existe');
+    if (emailExists) {
+      throw new UnauthorizedException('Email já está em uso');
+    }
+
+    const nameExists = await this.prisma.user.findUnique({ where: { name } });
+
+    if (nameExists) {
+      throw new UnauthorizedException('Nome de usuário já está em uso');
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -30,6 +36,14 @@ export class UserService {
         bio,
         avatar,
         password: hashPassword,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatar: true,
+        bio: true,
+        createdAt: true,
       },
     });
 
@@ -59,6 +73,32 @@ export class UserService {
   }
 
   async update(userId: string, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.email) {
+      const emailExists = await this.prisma.user.findFirst({
+        where: {
+          email: updateUserDto.email,
+          NOT: { id: userId },
+        },
+      });
+
+      if (emailExists) {
+        throw new UnauthorizedException('Email já está em uso');
+      }
+    }
+
+    if (updateUserDto.name) {
+      const nameExists = await this.prisma.user.findFirst({
+        where: {
+          name: updateUserDto.name,
+          NOT: { id: userId },
+        },
+      });
+
+      if (nameExists) {
+        throw new UnauthorizedException('Nome de usuário já está em uso');
+      }
+    }
+
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
