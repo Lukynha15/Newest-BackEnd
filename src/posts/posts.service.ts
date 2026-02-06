@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Like } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -203,7 +203,22 @@ export class PostsService {
     });
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string) {
+    const post = await this.prisma.post.findUnique({
+      where: { id },
+      select: { authorId: true },
+    });
+
+    if (!post) {
+      throw new Error('Post não encontrado');
+    }
+
+    if (post.authorId !== userId) {
+      throw new UnauthorizedException(
+        'Você não tem permissão para deletar este post',
+      );
+    }
+
     return await this.prisma.post.delete({ where: { id } });
   }
 }
