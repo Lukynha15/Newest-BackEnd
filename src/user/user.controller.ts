@@ -30,7 +30,8 @@ export class UserController {
       storage: diskStorage({
         destination: './uploads/avatars',
         filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
           callback(null, `avatar-${uniqueSuffix}${ext}`);
         },
@@ -137,8 +138,9 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+  @Delete('me')
+  removeMyAccount(@Req() req) {
+    const userId = req.user.userId;
+    return this.userService.remove(userId, userId);
   }
 }

@@ -74,6 +74,7 @@ export class PostsService {
         id: true,
         title: true,
         content: true,
+        image: true,
         likesCount: true,
         createdAt: true,
         author: {
@@ -98,6 +99,7 @@ export class PostsService {
         id: post.id,
         title: post.title,
         content: post.content,
+        image: post.image,
         likes: post.likesCount,
         createdAt: post.createdAt,
         author: post.author,
@@ -116,6 +118,7 @@ export class PostsService {
         title: true,
         content: true,
         likesCount: true,
+        image: true,
         createdAt: true,
         author: {
           select: {
@@ -137,6 +140,7 @@ export class PostsService {
       id: post.id,
       title: post.title,
       content: post.content,
+      image: post.image,
       likes: post.likesCount,
       createdAt: post.createdAt,
       author: post.author,
@@ -152,6 +156,7 @@ export class PostsService {
         title: true,
         content: true,
         likesCount: true,
+        image: true,
         createdAt: true,
         author: {
           select: {
@@ -191,6 +196,7 @@ export class PostsService {
         title: true,
         content: true,
         likesCount: true,
+        image: true,
         createdAt: true,
         author: {
           select: {

@@ -244,7 +244,11 @@ export class UserService {
     }));
   }
 
-  async remove(id: string) {
+  async remove(id: string, currentUserId: string) {
+    if (id !== currentUserId) {
+      throw new UnauthorizedException('Você só pode deletar sua própria conta');
+    }
+
     return await this.prisma.user.delete({ where: { id } });
   }
 }
