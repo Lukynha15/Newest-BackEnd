@@ -7,15 +7,16 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  email     String   @unique
+  id        String    @id @default(uuid())
+  name      String    @unique
+  email     String    @unique
   password  String
   avatar    String?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   bio       String?
   posts     Post[]
   likes     Like[]
+  comments  Comment[]
 }
 
 model Like {
@@ -45,6 +46,8 @@ model Comment {
   id        String   @id @default(uuid())
   content   String
   postId    String
+  authorId  String
   createdAt DateTime @default(now())
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }

@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
@@ -17,8 +18,15 @@ export class CommentController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentService.create(createCommentDto);
+  create(@Body() createCommentDto: CreateCommentDto, @Req() req) {
+    const userId = req.user.userId;
+    return this.commentService.create(createCommentDto, userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('post/:postId')
+  findByPostId(@Param('postId') postId: string) {
+    return this.commentService.findByPostId(postId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -29,7 +37,8 @@ export class CommentController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentService.remove(id);
+  remove(@Param('id') id: string, @Req() req) {
+    const userId = req.user.userId;
+    return this.commentService.remove(id, userId);
   }
 }
