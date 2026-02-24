@@ -90,6 +90,9 @@ export class PostsService {
               select: { id: true, userId: true, postId: true },
             }
           : false,
+        _count: {
+          select: { comments: true },
+        },
       },
     });
 
@@ -101,6 +104,7 @@ export class PostsService {
         content: post.content,
         image: post.image,
         likes: post.likesCount,
+        comments: post._count.comments,
         createdAt: post.createdAt,
         author: post.author,
         isLiked: isLiked,
@@ -133,6 +137,9 @@ export class PostsService {
               select: { id: true },
             }
           : false,
+        _count: {
+          select: { comments: true },
+        },
       },
     });
 
@@ -142,6 +149,7 @@ export class PostsService {
       content: post.content,
       image: post.image,
       likes: post.likesCount,
+      comments: post._count.comments,
       createdAt: post.createdAt,
       author: post.author,
       isLiked: post.likes ? post.likes.length > 0 : false,
@@ -171,6 +179,9 @@ export class PostsService {
               select: { id: true },
             }
           : false,
+        _count: {
+          select: { comments: true },
+        },
       },
     });
 
@@ -181,12 +192,13 @@ export class PostsService {
     return {
       ...post,
       likes: post.likesCount,
+      comments: post._count.comments,
       isLiked: Array.isArray(post.likes) && post.likes.length > 0,
     };
   }
 
   async create(createPostDto: CreatePostDto, userId: string) {
-    return this.prisma.post.create({
+    const post = await this.prisma.post.create({
       data: {
         ...createPostDto,
         authorId: userId,
@@ -205,8 +217,17 @@ export class PostsService {
             avatar: true,
           },
         },
+        _count: {
+          select: { comments: true },
+        },
       },
     });
+
+    return {
+      ...post,
+      likes: post.likesCount,
+      comments: post._count.comments,
+    };
   }
 
   async remove(id: string, userId: string) {
