@@ -13,6 +13,7 @@ export const UpdateUserSchema = z.object({
     .min(6, 'Senha deve ter pelo menos 6 caracteres')
     .optional(),
   bio: z.string().max(200, 'Bio pode ter no máximo 200 caracteres').optional(),
+  avatar: z.string().optional(),
 });
 
 export class UpdateUserDto extends createZodDto(UpdateUserSchema) {}
