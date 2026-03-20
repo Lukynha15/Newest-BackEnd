@@ -1,6 +1,6 @@
 import { Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
-import { NotificationService } from './notification.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { NotificationService } from './notification.service';
 
 @Controller('notification')
 @UseGuards(JwtAuthGuard)
@@ -9,6 +9,7 @@ export class NotificationController {
 
   @Get()
   findAll(@Req() req: any) {
+    console.log('user id:', req.user.id);
     return this.notificationService.findByUserId(req.user.id);
   }
 

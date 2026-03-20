@@ -7,7 +7,10 @@ export class NotificationService {
 
   async findByUserId(userId: string) {
     return this.prisma.notification.findMany({
-      where: { userId },
+      where: {
+        userId,
+        NOT: { actorId: userId },
+      },
       orderBy: { createdAt: 'desc' },
       include: {
         actor: {
