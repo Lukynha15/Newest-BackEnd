@@ -9,7 +9,6 @@ export class NotificationController {
 
   @Get()
   findAll(@Req() req: any) {
-    console.log('user id:', req.user.id);
     return this.notificationService.findByUserId(req.user.id);
   }
 
