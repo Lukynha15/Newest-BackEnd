@@ -24,6 +24,22 @@ export class CommentService {
       },
     });
 
+    const post = await this.prisma.post.findUnique({
+      where: { id: createCommentDto.postId },
+      select: { authorId: true },
+    });
+
+    if (post && post.authorId !== userId) {
+      await this.prisma.notification.create({
+        data: {
+          userId: post.authorId,
+          actorId: userId,
+          type: 'comment',
+          postId: createCommentDto.postId,
+        },
+      });
+    }
+
     return comment;
   }
 

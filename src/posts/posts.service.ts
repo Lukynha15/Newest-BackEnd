@@ -54,8 +54,20 @@ export class PostsService {
         select: {
           id: true,
           likesCount: true,
+          authorId: true,
         },
       });
+
+      if (updatedPost.authorId !== userId) {
+        await this.prisma.notification.create({
+          data: {
+            userId: updatedPost.authorId,
+            actorId: userId,
+            type: 'like',
+            postId,
+          },
+        });
+      }
 
       return {
         liked: true,
