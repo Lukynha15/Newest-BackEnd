@@ -19,7 +19,7 @@ export class CommentController {
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createCommentDto: CreateCommentDto, @Req() req) {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     return this.commentService.create(createCommentDto, userId);
   }
 
@@ -38,7 +38,7 @@ export class CommentController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req) {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     return this.commentService.remove(id, userId);
   }
 }

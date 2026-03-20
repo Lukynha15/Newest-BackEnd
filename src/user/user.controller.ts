@@ -66,14 +66,14 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@Req() req) {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     return this.userService.findById(userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('me')
   update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     return this.userService.update(userId, updateUserDto);
   }
 
@@ -102,7 +102,7 @@ export class UserController {
     }),
   )
   async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
-    const userId = req.user.userId;
+    const userId = req.user.id;
 
     if (!file) {
       throw new Error('Nenhum arquivo foi enviado');
@@ -133,14 +133,14 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get(':id/posts')
   async getUserPosts(@Param('id') id: string, @Req() req) {
-    const currentUserId = req.user.userId;
+    const currentUserId = req.user.id;
     return this.userService.getUserPosts(id, currentUserId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('me')
   removeMyAccount(@Req() req) {
-    const userId = req.user.userId;
+    const userId = req.user.id;
     return this.userService.remove(userId, userId);
   }
 }
