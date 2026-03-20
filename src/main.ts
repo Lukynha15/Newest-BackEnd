@@ -12,6 +12,7 @@ async function bootstrap() {
       'http://localhost:3001',
       'https://newest-app.vercel.app',
       'http://localhost:8080',
+      'http://192.168.0.103:8080',
     ],
     credentials: true,
   });
