@@ -94,15 +94,11 @@ export class PostsService {
         id: true,
         title: true,
         content: true,
-        image: true,
+        images: true,
         likesCount: true,
         createdAt: true,
         author: {
-          select: {
-            id: true,
-            name: true,
-            avatar: true,
-          },
+          select: { id: true, name: true, avatar: true },
         },
         likes: currentUserId
           ? {
@@ -110,27 +106,21 @@ export class PostsService {
               select: { id: true, userId: true, postId: true },
             }
           : false,
-        _count: {
-          select: { comments: true },
-        },
+        _count: { select: { comments: true } },
       },
     });
 
-    const result = posts.map((post: any) => {
-      const isLiked = post.likes ? post.likes.length > 0 : false;
-      return {
-        id: post.id,
-        title: post.title,
-        content: post.content,
-        image: post.image,
-        likes: post.likesCount,
-        comments: post._count.comments,
-        createdAt: post.createdAt,
-        author: post.author,
-        isLiked: isLiked,
-      };
-    });
-    return result;
+    return posts.map((post: any) => ({
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      images: post.images,
+      likes: post.likesCount,
+      comments: post._count.comments,
+      createdAt: post.createdAt,
+      author: post.author,
+      isLiked: post.likes ? post.likes.length > 0 : false,
+    }));
   }
 
   async findByUserId(userId: string, currentUserId?: string) {
@@ -142,24 +132,15 @@ export class PostsService {
         title: true,
         content: true,
         likesCount: true,
-        image: true,
+        images: true,
         createdAt: true,
         author: {
-          select: {
-            id: true,
-            name: true,
-            avatar: true,
-          },
+          select: { id: true, name: true, avatar: true },
         },
         likes: currentUserId
-          ? {
-              where: { userId: currentUserId },
-              select: { id: true },
-            }
+          ? { where: { userId: currentUserId }, select: { id: true } }
           : false,
-        _count: {
-          select: { comments: true },
-        },
+        _count: { select: { comments: true } },
       },
     });
 
@@ -167,7 +148,7 @@ export class PostsService {
       id: post.id,
       title: post.title,
       content: post.content,
-      image: post.image,
+      images: post.images,
       likes: post.likesCount,
       comments: post._count.comments,
       createdAt: post.createdAt,
@@ -184,30 +165,19 @@ export class PostsService {
         title: true,
         content: true,
         likesCount: true,
-        image: true,
+        images: true,
         createdAt: true,
         author: {
-          select: {
-            id: true,
-            name: true,
-            avatar: true,
-          },
+          select: { id: true, name: true, avatar: true },
         },
         likes: currentUserId
-          ? {
-              where: { userId: currentUserId },
-              select: { id: true },
-            }
+          ? { where: { userId: currentUserId }, select: { id: true } }
           : false,
-        _count: {
-          select: { comments: true },
-        },
+        _count: { select: { comments: true } },
       },
     });
 
-    if (!post) {
-      throw new Error('Post não encontrado');
-    }
+    if (!post) throw new Error('Post não encontrado');
 
     return {
       ...post,
@@ -228,18 +198,12 @@ export class PostsService {
         title: true,
         content: true,
         likesCount: true,
-        image: true,
+        images: true,
         createdAt: true,
         author: {
-          select: {
-            id: true,
-            name: true,
-            avatar: true,
-          },
+          select: { id: true, name: true, avatar: true },
         },
-        _count: {
-          select: { comments: true },
-        },
+        _count: { select: { comments: true } },
       },
     });
 
@@ -247,10 +211,7 @@ export class PostsService {
     if (mentions) {
       const usernames = mentions.map((m) => m.slice(1));
       const mentionedUsers = await this.prisma.user.findMany({
-        where: {
-          name: { in: usernames },
-          NOT: { id: userId },
-        },
+        where: { name: { in: usernames }, NOT: { id: userId } },
         select: { id: true },
       });
 
