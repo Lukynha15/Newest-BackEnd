@@ -40,6 +40,31 @@ export class CommentService {
       });
     }
 
+    const mentions = createCommentDto.content.match(/@(\w+)/g);
+    if (mentions) {
+      const usernames = mentions.map((m) => m.slice(1));
+      const mentionedUsers = await this.prisma.user.findMany({
+        where: {
+          name: { in: usernames },
+          NOT: { id: userId },
+        },
+        select: { id: true },
+      });
+
+      await Promise.all(
+        mentionedUsers.map((user) =>
+          this.prisma.notification.create({
+            data: {
+              userId: user.id,
+              actorId: userId,
+              type: 'mention',
+              postId: createCommentDto.postId,
+            },
+          }),
+        ),
+      );
+    }
+
     return comment;
   }
 
