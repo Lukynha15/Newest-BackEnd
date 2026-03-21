@@ -1,11 +1,40 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Like } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 
 @Injectable()
 export class PostsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private configService: ConfigService,
+  ) {}
+
+  private async checkImage(imageUrl: string): Promise<boolean> {
+    const user = this.configService.get('SIGHTENGINE_USER');
+    const secret = this.configService.get('SIGHTENGINE_SECRET');
+
+    const response = await fetch(
+      `https://api.sightengine.com/1.0/check.json?url=${encodeURIComponent(imageUrl)}&models=nudity,violence&api_user=${user}&api_secret=${secret}`,
+    );
+
+    const data = await response.json();
+
+    if (
+      data.nudity?.raw > 0.5 ||
+      data.nudity?.partial > 0.7 ||
+      data.violence?.prob > 0.7
+    ) {
+      return false;
+    }
+
+    return true;
+  }
 
   async toggleLike(postId: string, userId: string) {
     const existingLike: Like | null = await this.prisma.like.findUnique({
@@ -188,6 +217,18 @@ export class PostsService {
   }
 
   async create(createPostDto: CreatePostDto, userId: string) {
+    if (createPostDto.images && createPostDto.images.length > 0) {
+      const results = await Promise.all(
+        createPostDto.images.map((url) => this.checkImage(url)),
+      );
+
+      if (results.some((r) => r === false)) {
+        throw new BadRequestException(
+          'Uma ou mais imagens contêm conteúdo não permitido',
+        );
+      }
+    }
+
     const post = await this.prisma.post.create({
       data: {
         ...createPostDto,
