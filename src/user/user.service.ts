@@ -207,10 +207,16 @@ export class UserService {
     };
   }
 
-  async getUserPosts(userId: string, currentUserId?: string) {
+  async getUserPosts(userId: string, currentUserId?: string): Promise<any[]> {
     const posts = await this.prisma.post.findMany({
       where: { authorId: userId },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        images: true,
+        likesCount: true,
+        createdAt: true,
         author: {
           select: {
             id: true,
@@ -226,7 +232,6 @@ export class UserService {
           : false,
         _count: {
           select: {
-            likes: true,
             comments: true,
           },
         },
@@ -236,9 +241,9 @@ export class UserService {
       },
     });
 
-    return posts.map((post) => ({
+    return posts.map((post: any): any => ({
       ...post,
-      likes: post._count.likes,
+      likes: post.likesCount,
       comments: post._count.comments,
       isLiked: Array.isArray(post.likes) && post.likes.length > 0,
     }));

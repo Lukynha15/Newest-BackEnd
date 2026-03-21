@@ -16,14 +16,14 @@ export class PostsService {
   ) {}
 
   private async checkImage(imageUrl: string): Promise<boolean> {
-    const user = this.configService.get('SIGHTENGINE_USER');
-    const secret = this.configService.get('SIGHTENGINE_SECRET');
-
+    const user = this.configService.get<string>('SIGHTENGINE_USER');
+    const secret = this.configService.get<string>('SIGHTENGINE_SECRET');
     const response = await fetch(
       `https://api.sightengine.com/1.0/check.json?url=${encodeURIComponent(imageUrl)}&models=nudity,violence&api_user=${user}&api_secret=${secret}`,
     );
 
     const data = await response.json();
+    console.log('Sightengine response:', JSON.stringify(data));
 
     if (
       data.nudity?.raw > 0.5 ||
